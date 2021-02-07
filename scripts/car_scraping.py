@@ -18,5 +18,10 @@ class CarScraper:
         print(self.start_url)
 
     def perform_scraping(self):
+        # Get the first data from the start url
         page = requests.get(self.start_url)
+        if (page.status_code > 299 or page.status_code < 200):
+            print('Invalid request for ' +self.start_url + ' status code was ' + page.status_code)
+            exit
+        
         soup = BeautifulSoup(page.content, 'html.parser')
