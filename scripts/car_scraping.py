@@ -4,8 +4,19 @@
 
 import requests
 from bs4 import BeautifulSoup
+from .models.car import Car
 
-URL = 'https://en.wikipedia.org/wiki/Lamborghini_Jalpa'
-page = requests.get(URL)
+# Class to describe the car scraper
+class CarScraper:
+    def __init__(self, manufacturer):
+        self.base_url = 'https://en.wikipedia.org/wiki/'
+        self.manufacturer = manufacturer
+        self.start_url = ''
+    
+    def setup_scraping(self):
+        self.start_url = self.base_url + self.manufacturer
+        print(self.start_url)
 
-soup = BeautifulSoup(page.content, 'html.parser')
+    def perform_scraping(self):
+        page = requests.get(self.start_url)
+        soup = BeautifulSoup(page.content, 'html.parser')
