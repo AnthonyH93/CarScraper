@@ -1,5 +1,7 @@
 Audi
+Bentley
 BMW
+Bugatti
 Buick
 Cadillac
 Chevrolet
@@ -10,26 +12,27 @@ Honda
 Hummer
 Hyundai
 Infiniti
-Isuzu
 Jaguar
 Jeep
 Kia
+Koenigsegg
 Lamborghini
 Land Rover
 Lexus
 Lincoln
 Lotus
 Mazda
+McLaren
 Mercedes-Benz
 Mercury
 Mitsubishi
 Nissan
 Oldsmobile
+Pagani
 Peugeot
 Pontiac
 Porsche
 Saab
-Saturn
 Subaru
 Suzuki
 Toyota

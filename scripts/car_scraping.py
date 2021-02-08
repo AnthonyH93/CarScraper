@@ -26,9 +26,15 @@ class CarScraper:
     
     def setup_scraping(self):
         self.start_url = self.base_url + '/wiki/' + self.manufacturer
-        # Some manufacturers need to add _Cars
+        # Some manufacturers need to add _Cars or other prefixes
         if (self.manufacturer == 'Jaguar' or self.manufacturer == 'Lotus'):
             self.start_url = self.start_url + '_Cars'
+        if (self.manufacturer == 'Lincoln'):
+            self.start_url = self.start_url + '_Motor_Company'
+        if (self.manufacturer == 'Mercury'):
+            self.start_url = self.start_url + '_(automobile)'
+        if (self.manufacturer == 'Pagani'):
+            self.start_url = self.start_url + '_(company)'
         print(self.start_url)
 
     def perform_scraping(self):
