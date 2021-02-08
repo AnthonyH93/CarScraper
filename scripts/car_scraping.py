@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from .models.car import Car
 from random import randrange
 import time
+import re
 
 headers = {
     'Access-Control-Allow-Origin': '*',
@@ -25,8 +26,8 @@ class CarScraper:
     
     def setup_scraping(self):
         self.start_url = self.base_url + '/wiki/' + self.manufacturer
-        # Jaguar is a special case
-        if (self.manufacturer == 'Jaguar'):
+        # Some manufacturers need to add _Cars
+        if (self.manufacturer == 'Jaguar' or self.manufacturer == 'Lotus'):
             self.start_url = self.start_url + '_Cars'
         print(self.start_url)
 
@@ -69,6 +70,7 @@ class CarScraper:
             print(links_to_lists[0])
             next_url = self.base_url + links_to_lists[0]
         
+        print(next_url)
         next_page = requests.get(next_url, headers)
         if (next_page.status_code > 299 or next_page.status_code < 200):
             print('Invalid request for ' + next_url + ' status code was ' + next_page.status_code)
@@ -84,14 +86,20 @@ class CarScraper:
             if (self.manufacturer not in link.get('title')):
                 continue
             else:
-                possible_car_links.append(self.base_url + link.get('href'))
+                found_link = link.get('href')
+                # Ensure links found build on base url
+                if found_link.startswith('/'):
+                    possible_car_links.append(self.base_url + found_link)
 
         print(len(possible_car_links))
         # Explore each potential car link and extract information if a car is found
         link_counter = 0
+        cars_found = []
+        regex = re.compile('[@_,+!#$%^&*()<>?/|}{~:]')
         for link in possible_car_links:
             # Delay to avoid overloading the server
             time.sleep(0.1)
+            print(possible_car_links[link_counter])
             current_page = requests.get(possible_car_links[link_counter], headers)
             link_counter += 1
 
@@ -102,5 +110,22 @@ class CarScraper:
             else:
                 soup = BeautifulSoup(current_page.content, 'html.parser')
                 all_tables = soup.find_all('table', class_='infobox hproduct')
-                print(all_tables)
+
+                if len(all_tables) > 0:
+                    print('Might have found a car')
+                    # Look through tables for tables that resemble a car
+                    for table in all_tables:
+                        if table.find('th', class_='fn'):
+                            table_title = table.find('th', class_='fn')
+                            if (self.manufacturer not in table_title.text.strip()):
+                                continue
+                            else:
+                                # Add this table to the cars found list if it matches the expected form
+                                if regex.search(table_title.text.strip().replace(' ', '')) == None:
+                                    cars_found.append(table)
+                                    print("Found: " + table_title.text.strip())
+                        else:
+                            continue
+                else:
+                    continue
 
