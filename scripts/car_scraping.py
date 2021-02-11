@@ -139,14 +139,15 @@ class CarScraper:
                     continue
         
         # Ready to iterate through the rows of the tables to gather car information
+        full_cars_found = []
         for car_table in cars_found:
             # First, get the model of the car
             car_table_title = car_table.find('th', class_='fn').text.strip()
 
             car_manufacturer = self.manufacturer
             car_model = car_table_title.replace(self.manufacturer, '').replace(' ', '')
-            car_first_year_produced = ''
-            car_last_year_produced = ''
+            car_assembly_location = ''
+            car_years_produced = ''
             car_engine = ''
             car_transmission = ''
             car_weight = ''
@@ -161,10 +162,12 @@ class CarScraper:
                     car_row_data = car_row.find('td').text.strip()
 
                     # Check the row titles for the data needed to create a new car
-                    if 'production' in car_row_title.lower():
-                        car_first_year_produced = car_row_data
-                        car_last_year_produced = car_row_data
-                        values_found += 2
+                    if 'assembly' in car_row_title.lower():
+                        car_assembly_location = car_row_data
+                        values_found += 1
+                    elif 'production' in car_row_title.lower():
+                        car_years_produced = car_row_data
+                        values_found += 1
                     elif 'engine' in car_row_title.lower():
                         car_engine = car_row_data
                         values_found += 1
@@ -180,7 +183,8 @@ class CarScraper:
                     continue
 
             if values_found == 7:
-                print('Fully found a car')   
-
+                print('Fully found a car')
+                new_car = Car(car_manufacturer, car_model, car_assembly_location, car_years_produced, car_engine, car_transmission, car_weight)  
+                full_cars_found.append(new_car)
 
 
