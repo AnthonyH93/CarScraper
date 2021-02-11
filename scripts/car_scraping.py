@@ -29,12 +29,14 @@ class CarScraper:
         # Some manufacturers need to add _Cars or other prefixes
         if (self.manufacturer == 'Jaguar' or self.manufacturer == 'Lotus'):
             self.start_url = self.start_url + '_Cars'
-        if (self.manufacturer == 'Lincoln'):
+        if (self.manufacturer == 'Lincoln' or self.manufacturer == 'Pontiac'):
             self.start_url = self.start_url + '_Motor_Company'
         if (self.manufacturer == 'Mercury'):
             self.start_url = self.start_url + '_(automobile)'
         if (self.manufacturer == 'Pagani'):
             self.start_url = self.start_url + '_(company)'
+        if (self.manufacturer == 'McLaren'):
+            self.start_url = self.start_url + '_Automotive'
         print(self.start_url)
 
     def perform_scraping(self):
@@ -48,6 +50,10 @@ class CarScraper:
 
         all_links = soup.find_all(lambda tag:tag.name == 'a' and 'title' in tag.attrs)
 
+        # Use a dictionary to ensure links are not repeated
+        simple_hash_table = {}
+        hash_table_counter = 0
+
         links_to_lists = []
         # Check if manufacturer has a list of automobiles
         for link in all_links:
@@ -58,7 +64,15 @@ class CarScraper:
                 if ((self.manufacturer not in link.get('title')) or (('vehicle' or 'car' or 'auto') not in link.get('title'))):
                     continue 
                 else:
-                    links_to_lists.append(link.get('href'))
+                    link_to_add = link.get('href')
+                    is_new_link = simple_hash_table.get(link_to_add, -1)
+                    if is_new_link == -1:
+                        links_to_lists.append(link_to_add)
+                        simple_hash_table.update({link_to_add: hash_table_counter})
+                        hash_table_counter += 1
+                    else:
+                        print("CONFLICT")
+                        continue
         
         # Decide next URL to scrape
         next_url = ''
@@ -96,6 +110,14 @@ class CarScraper:
                 # Ensure links found build on base url
                 if found_link.startswith('/'):
                     possible_car_links.append(self.base_url + found_link)
+                is_new_link = simple_hash_table.get(found_link, -1)
+                if is_new_link == -1:
+                    links_to_lists.append(found_link)
+                    simple_hash_table.update({found_link: hash_table_counter})
+                    hash_table_counter += 1
+                else:
+                    continue
+                
 
         print(len(possible_car_links))
         # Explore each potential car link and extract information if a car is found

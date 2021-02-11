@@ -14,10 +14,8 @@ Hyundai
 Infiniti
 Jaguar
 Jeep
-Kia
 Koenigsegg
 Lamborghini
-Land Rover
 Lexus
 Lincoln
 Lotus
@@ -25,16 +23,13 @@ Mazda
 McLaren
 Mercedes-Benz
 Mercury
-Mitsubishi
 Nissan
 Oldsmobile
 Pagani
 Peugeot
 Pontiac
 Porsche
-Saab
 Subaru
 Suzuki
 Toyota
 Volkswagen
-Volvo
