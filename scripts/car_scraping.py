@@ -103,6 +103,9 @@ class CarScraper:
         cars_found = []
         regex = re.compile('[@_,+!#$%^&*()<>?/|}{~:]')
         for link in possible_car_links:
+            # Temporary limit
+            if link_counter > 10:
+                break
             # Delay to avoid overloading the server
             time.sleep(0.1)
             print(possible_car_links[link_counter])
@@ -134,4 +137,50 @@ class CarScraper:
                             continue
                 else:
                     continue
+        
+        # Ready to iterate through the rows of the tables to gather car information
+        for car_table in cars_found:
+            # First, get the model of the car
+            car_table_title = car_table.find('th', class_='fn').text.strip()
+
+            car_manufacturer = self.manufacturer
+            car_model = car_table_title.replace(self.manufacturer, '').replace(' ', '')
+            car_first_year_produced = ''
+            car_last_year_produced = ''
+            car_engine = ''
+            car_transmission = ''
+            car_weight = ''
+
+            values_found = 2
+
+            # Next, get all the rows and iterate through them
+            car_table_rows = car_table.find_all('tr')
+            for car_row in car_table_rows:
+                if car_row.find('th') and car_row.find('td'):
+                    car_row_title = car_row.find('th').text.strip()
+                    car_row_data = car_row.find('td').text.strip()
+
+                    # Check the row titles for the data needed to create a new car
+                    if 'production' in car_row_title.lower():
+                        car_first_year_produced = car_row_data
+                        car_last_year_produced = car_row_data
+                        values_found += 2
+                    elif 'engine' in car_row_title.lower():
+                        car_engine = car_row_data
+                        values_found += 1
+                    elif 'transmission' in car_row_title.lower():
+                        car_transmission = car_row_data
+                        values_found += 1
+                    elif 'weight' in car_row_title.lower():
+                        car_weight = car_row_data
+                        values_found += 1
+                    else:
+                        continue
+                else:
+                    continue
+
+            if values_found == 7:
+                print('Fully found a car')   
+
+
 
