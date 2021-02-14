@@ -6,6 +6,7 @@ import smtplib, ssl
 from .models.car import Car
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from random import randrange
 
 class EmailSender:
     def __init__(self, cars_list):
@@ -38,30 +39,38 @@ class EmailSender:
         text_message = """\
         Hello,
 
-        This is a test email.
+        The car of the day is the {manufacturer} {model}.
+
+        This car was produced from {production}.
+
+        It was built in the following locations:
+        {location}
+
+        Key Stats:
+
+        Engine: {engine}
+        Transmission: {transmission}
+        Curb Weight: {weight}
+
+        Information scraped from: {source}
 
         From,
 
         Car Scraper
-        """
-
-        html_message = """\
-        <html>
-            <body>
-                <p> Hello,<br>
-                This is a test email.<br>
-                From, <br>
-                Car Scraper
-                </p>
-            </body>
-        </html>
-        """
+        """.format(
+            manufacturer=car.manufacturer,
+            model=car.model,
+            production=car.years_produced,
+            location=car.assembly_location,
+            engine=car.engine,
+            transmission=car.transmission,
+            weight=car.weight,
+            source=car.source
+        )
 
         email_message_text = MIMEText(text_message, "plain")
-        email_message_html = MIMEText(html_message, "html")
 
         email_message.attach(email_message_text)
-        email_message.attach(email_message_html)
 
         return email_message
 
@@ -74,7 +83,10 @@ class EmailSender:
 
             # Logged into dev email now, can send emails
             for email in self.emails_list:
-                email_content = self.get_email_content(self.cars_list[0], email)
+                # Pick a random car from the list
+                rand_index = randrange(len(self.cars_list))
+
+                email_content = self.get_email_content(self.cars_list[rand_index], email)
                 server.sendmail(
                     self.email_to_use, email, email_content.as_string()
                 )

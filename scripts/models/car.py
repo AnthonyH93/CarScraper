@@ -1,6 +1,6 @@
 # Class to describe a car
 class Car:
-    def __init__(self, manufacturer, model, assembly_location, years_produced, engine, transmission, weight):
+    def __init__(self, manufacturer, model, assembly_location, years_produced, engine, transmission, weight, source):
         self.manufacturer = manufacturer
         self.model = model
         self.assembly_location = assembly_location
@@ -8,3 +8,4 @@ class Car:
         self.engine = engine
         self.transmission = transmission
         self.weight = weight
+        self.source = source

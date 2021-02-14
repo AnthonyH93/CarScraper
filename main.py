@@ -25,6 +25,6 @@ car_scraper = CarScraper(random_manufacturer)
 car_scraper.setup_scraping()
 cars_found = car_scraper.perform_scraping()
 
-email_sender = EmailSender(cars_found)
-
-email_sender.perform_complete_emailing_function()
+if (len(cars_found) > 0):
+    email_sender = EmailSender(cars_found)
+    email_sender.perform_complete_emailing_function()

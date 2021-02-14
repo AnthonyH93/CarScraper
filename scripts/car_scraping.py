@@ -65,14 +65,7 @@ class CarScraper:
                     continue 
                 else:
                     link_to_add = link.get('href')
-                    is_new_link = simple_hash_table.get(link_to_add, -1)
-                    if is_new_link == -1:
-                        links_to_lists.append(link_to_add)
-                        simple_hash_table.update({link_to_add: hash_table_counter})
-                        hash_table_counter += 1
-                    else:
-                        print("CONFLICT")
-                        continue
+                    links_to_lists.append(link_to_add)
         
         # Decide next URL to scrape
         next_url = ''
@@ -81,16 +74,12 @@ class CarScraper:
             next_url = self.start_url
         elif len(links_to_lists) > 1:
             # Need to pick one of the links to follow
-            print(len(links_to_lists))
             random_selection = randrange(len(links_to_lists))
             next_url = self.base_url + links_to_lists[random_selection]
         else:
             # Should have a link to a list of vehicles by the given manufacturer
-            print(1)
-            print(links_to_lists[0])
             next_url = self.base_url + links_to_lists[0]
         
-        print(next_url)
         next_page = requests.get(next_url, headers)
         if (next_page.status_code > 299 or next_page.status_code < 200):
             print('Invalid request for ' + next_url + ' status code was ' + next_page.status_code)
@@ -107,25 +96,25 @@ class CarScraper:
                 continue
             else:
                 found_link = link.get('href')
+                url_to_add = self.base_url + found_link
+                # Ensure links are not duplicated
+                is_new_link = simple_hash_table.get(url_to_add, -1)
                 # Ensure links found build on base url
-                if found_link.startswith('/'):
-                    possible_car_links.append(self.base_url + found_link)
-                is_new_link = simple_hash_table.get(found_link, -1)
                 if is_new_link == -1:
-                    links_to_lists.append(found_link)
                     simple_hash_table.update({found_link: hash_table_counter})
                     hash_table_counter += 1
+                    if found_link.startswith('/'):
+                        possible_car_links.append(url_to_add)
                 else:
                     continue
                 
-        print(len(possible_car_links))
         # Explore each potential car link and extract information if a car is found
         link_counter = 0
         cars_found = []
         regex = re.compile('[@_,+!#$%^&*()<>?/|}{~:]')
         for link in possible_car_links:
-            # Temporary limit
-            if link_counter > 10:
+            # Keep a link limit to avoid long execution time
+            if link_counter > 25:
                 break
             # Delay to avoid overloading the server
             time.sleep(0.1)
@@ -205,7 +194,47 @@ class CarScraper:
 
             if values_found == 7:
                 print('Fully found a car')
-                new_car = Car(car_manufacturer, car_model, car_assembly_location, car_years_produced, car_engine, car_transmission, car_weight)  
+                
+                # Clean up the data before creating the car object
+                car_assembly_location_final = ''
+                car_years_produced_final = ''
+                car_engine_final = ''
+                car_transmission_final = ''
+                car_weight_final = ''
+                
+                years = car_years_produced.split('[')
+                if len(years) > 0:
+                    car_years_produced_final = years[0]
+                else:
+                    car_years_produced_final = car_years_produced
+                
+                weights = car_weight.split('[')
+                if len(weights) > 0:
+                    car_weight_final = weights[0]
+                else:
+                    car_weight_final = car_weight
+                
+                engines = car_engine.split('[')
+                if len(engines) > 0:
+                    car_engine_final = engines[0]
+                else:
+                    car_engine_final = car_engine
+
+                transmissions = car_transmission.split('[')
+                if len(transmissions) > 0:
+                    car_transmission_final = transmissions[0]
+                else:
+                    car_transmission_final = car_transmission
+                
+                locations = car_assembly_location.split('[')
+                if len(locations) > 0:
+                    car_assembly_location_final = locations[0]
+                else:
+                    car_assembly_location_final = car_assembly_location
+
+                car_source = self.start_url
+
+                new_car = Car(car_manufacturer, car_model, car_assembly_location_final, car_years_produced_final, car_engine_final, car_transmission_final, car_weight_final, car_source)  
                 # Want unique entries in the full_cars_found list
                 if full_cars_found.count(new_car) == 0:
                     full_cars_found.append(new_car)

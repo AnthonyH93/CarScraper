@@ -10,7 +10,6 @@ Ferrari
 Ford
 Honda
 Hummer
-Hyundai
 Infiniti
 Jaguar
 Jeep
@@ -30,6 +29,5 @@ Peugeot
 Pontiac
 Porsche
 Subaru
-Suzuki
 Toyota
 Volkswagen
