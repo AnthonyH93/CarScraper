@@ -3,6 +3,7 @@
 # Year: 2021
 
 from scripts.car_scraping import CarScraper
+from scripts.email_sender import EmailSender
 from random import randrange
 
 # Choose a random car manufacturer from the list
@@ -22,4 +23,8 @@ random_manufacturer = car_manufacturers[random_number]
 car_scraper = CarScraper(random_manufacturer)
 
 car_scraper.setup_scraping()
-car_scraper.perform_scraping()
+cars_found = car_scraper.perform_scraping()
+
+email_sender = EmailSender(cars_found)
+
+email_sender.perform_complete_emailing_function()

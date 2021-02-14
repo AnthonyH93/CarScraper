@@ -118,7 +118,6 @@ class CarScraper:
                 else:
                     continue
                 
-
         print(len(possible_car_links))
         # Explore each potential car link and extract information if a car is found
         link_counter = 0
@@ -207,6 +206,9 @@ class CarScraper:
             if values_found == 7:
                 print('Fully found a car')
                 new_car = Car(car_manufacturer, car_model, car_assembly_location, car_years_produced, car_engine, car_transmission, car_weight)  
-                full_cars_found.append(new_car)
-
-
+                # Want unique entries in the full_cars_found list
+                if full_cars_found.count(new_car) == 0:
+                    full_cars_found.append(new_car)
+        
+        # Done scraping
+        return full_cars_found
